@@ -1,18 +1,30 @@
-from fastapi import FastAPI, Header, status, HTTPException
+from fastapi import FastAPI
 from src.books.routes import book_router
+from contextlib import asynccontextmanager
+from src.db.main import init_db
 
 
-version = 'v1'
+@asynccontextmanager
+async def life_span(app: FastAPI):
+    print('---------------- Server is starting -----------')
+    await init_db()
+    yield 
+    print("Server has been Terminated")
+
+version = "v1"
 
 app = FastAPI(
     title="Bookly",
     description="A rest api for a book Review web service",
-    version=version
-
+    version=version,
+    lifespan=life_span
 )
+
 app.include_router(book_router, prefix=f"/api/{version}/book")
 
 
 @app.get("/")
 def testing():
     return {"message": "Hi there"}
+
+
