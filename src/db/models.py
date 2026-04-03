@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, Field, Column
 from datetime import datetime, date
+from typing import Optional
 import uuid
 import sqlalchemy.dialects.postgresql as pg
 from sqlalchemy.sql import func
@@ -8,8 +9,9 @@ from sqlalchemy.sql import func
 class Book(SQLModel, table=True):
     __tablename__ = "books"
 
-    uid: uuid.UUID = Field(
-        sa_column=Column(pg.UUID, primary_key=True, default=uuid.uuid4)
+    uid: Optional[uuid.UUID] = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(pg.UUID, primary_key=True, default=uuid.uuid4, nullable=False)
     )
 
     title: str
@@ -19,12 +21,16 @@ class Book(SQLModel, table=True):
     page_count: int
     language: str
 
-    created_at: datetime = Field(
-        sa_column=Column(pg.TIMESTAMP, server_default=func.now())
+    created_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(pg.TIMESTAMP, server_default=func.now(), nullable=False)
     )
 
-    updated_at: datetime = Field(
-        sa_column=Column(pg.TIMESTAMP, server_default=func.now(), onupdate=func.now())
+    updated_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(
+            pg.TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False
+        )
     )
 
     def __repr__(self):
