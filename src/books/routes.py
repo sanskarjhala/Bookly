@@ -4,7 +4,7 @@ from src.books.schemas import BookUpdateModel, BookCreateModel,BookResponseModel
 from src.books.service import BookService
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.main import get_session
-from src.db.models import Book
+from src.books.models import Book
 
 book_router = APIRouter()
 book_service = BookService()
