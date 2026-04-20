@@ -14,7 +14,7 @@ class BookService:
     async def get_particular_book(self, book_uid: str, session: AsyncSession):
         statement = select(Book).where(Book.uid == book_uid)
         result = await session.exec(statement=statement)
-        return result if result is not None else None
+        return result.first()
 
     async def create_book(self, book_data: BookCreateModel, session: AsyncSession):
         try:
