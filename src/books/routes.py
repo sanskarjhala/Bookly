@@ -1,13 +1,15 @@
 from typing import List
 from fastapi import HTTPException, APIRouter, Depends, status
-from src.books.schemas import BookUpdateModel, BookCreateModel,BookResponseModel
+from src.books.schemas import BookUpdateModel, BookCreateModel, BookResponseModel
 from src.books.service import BookService
 from sqlmodel.ext.asyncio.session import AsyncSession
 from src.db.main import get_session
 from src.books.models import Book
+from src.auth.dependency import AccessTokenBearer
 
 book_router = APIRouter()
 book_service = BookService()
+access_token_bearer = AccessTokenBearer()
 
 
 @book_router.get("/all-books", response_model=List[BookResponseModel])
@@ -22,7 +24,9 @@ async def get_user_books(user_id: str, session: AsyncSession = Depends(get_sessi
     pass
 
 
-@book_router.get("/{book_uid}", response_model=BookResponseModel, status_code=status.HTTP_200_OK)
+@book_router.get(
+    "/{book_uid}", response_model=BookResponseModel, status_code=status.HTTP_200_OK
+)
 async def get_book_by_id(
     book_uid: str, session: AsyncSession = Depends(get_session)
 ) -> dict:
@@ -34,7 +38,9 @@ async def get_book_by_id(
 
 
 @book_router.patch(
-    "/update/{book_id}", response_model=BookResponseModel, status_code=status.HTTP_200_OK
+    "/update/{book_id}",
+    response_model=BookResponseModel,
+    status_code=status.HTTP_200_OK,
 )
 async def update_book(
     book_uid: str,
@@ -64,11 +70,10 @@ async def delete_book(book_uid: str, session: AsyncSession = Depends(get_session
 @book_router.post(
     "/create-book",
     # response_model=BookResponseModel,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_new_book(
-    book_data: BookCreateModel,
-    session: AsyncSession = Depends(get_session)
+    book_data: BookCreateModel, session: AsyncSession = Depends(get_session)
 ):
     result = await book_service.create_book(book_data, session)
 
